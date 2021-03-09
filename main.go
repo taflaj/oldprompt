@@ -9,14 +9,17 @@ import (
 	"github.com/taflaj/prompt/prompt"
 )
 
+const version = "1.0.0"
+
 func init() {}
 
 func doHelp() {
 	fmt.Printf("Usage: %v <command>\n", os.Args[0])
 	fmt.Println("Commands:")
-	fmt.Println("  help  Displays this message and exits.")
-	fmt.Println("  init  Displays text to be used inside a shell script.")
-	fmt.Println("  show  Displays the prompt according to the parameters.")
+	fmt.Println("  help     Displays this message.")
+	fmt.Println("  init     Displays text to be used inside a shell script.")
+	fmt.Println("  show     Displays the prompt according to the parameters.")
+	fmt.Printf("  version  Displays the current version (%v).\n", version)
 }
 
 func main() {
@@ -34,6 +37,8 @@ func main() {
 			fmt.Println("}")
 		case "show":
 			prompt.Show()
+		case "version":
+			fmt.Printf("%v %v\n", os.Args[0], version)
 		default:
 			fmt.Println("Invalid command")
 			doHelp()
