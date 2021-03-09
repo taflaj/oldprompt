@@ -4,7 +4,6 @@ package prompt
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -18,11 +17,11 @@ const (
 var (
 	options map[string]string
 	reset   string
-	spaces  bool
+	cozy    bool
 )
 
 func init() {
-	log.SetFlags(log.Flags() | log.Lmicroseconds)
+	// log.SetFlags(log.Flags() | log.Lmicroseconds)
 }
 
 func getOptions() {
@@ -30,7 +29,9 @@ func getOptions() {
 	splits := strings.Split(os.Getenv("options"), ";")
 	for _, split := range splits {
 		subsplits := strings.Split(split, "=")
-		options[strings.Trim(subsplits[0], " ")] = strings.Trim(subsplits[1], " ")
+		if len(subsplits) == 2 {
+			options[strings.Trim(subsplits[0], " ")] = strings.Trim(subsplits[1], " ")
+		}
 	}
 }
 
@@ -62,13 +63,13 @@ func getStatus() string {
 	status := ""
 	if os.Getenv("code") != "0" {
 		status += "\uf12a" // exclamation
-		if spaces {
+		if !cozy {
 			status += " "
 		}
 	}
 	if os.Getenv("jobs") != "0" {
 		status += "\uf252" // hourglass
-		if spaces {
+		if !cozy {
 			status += " "
 		}
 	}
@@ -81,7 +82,7 @@ func getStatus() string {
 }
 
 func addSpaces(s string) string {
-	if spaces {
+	if !cozy {
 		return " " + s + " "
 	}
 	return s
@@ -126,6 +127,6 @@ func Show() {
 	if options["weight"] == "bold" {
 		reset = "\\[\x1b[0;1m\\]"
 	}
-	spaces = options["spaces"] == "yes"
+	cozy = options["cozy"] == "yes"
 	fmt.Print(getStatus() + getUser() + getHost() + getDir() + plain + " ")
 }
