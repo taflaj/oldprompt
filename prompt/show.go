@@ -10,8 +10,13 @@ import (
 )
 
 const (
-	separator = "\ue0b0" // right triangle
-	plain     = "\\[\x1b[0m\\]"
+	clock       = "\uf017"
+	exclamation = "\uf12a"
+	home        = "\uf015"
+	separator   = "\ue0b0"
+	shortcut    = "\uf0c4"
+	start       = "\ue0b6"
+	plain       = "\\[\x1b[0m\\]"
 )
 
 var (
@@ -20,9 +25,7 @@ var (
 	cozy    bool
 )
 
-func init() {
-	// log.SetFlags(log.Flags() | log.Lmicroseconds)
-}
+func init() {}
 
 func getOptions() {
 	options = make(map[string]string)
@@ -62,13 +65,13 @@ func getColors(s string) (string, string) {
 func getStatus() string {
 	status := ""
 	if os.Getenv("code") != "0" {
-		status += "\uf12a" // exclamation
+		status += exclamation
 		if !cozy {
 			status += " "
 		}
 	}
 	if os.Getenv("jobs") != "0" {
-		status += "\uf252" // hourglass
+		status += clock
 		if !cozy {
 			status += " "
 		}
@@ -78,7 +81,7 @@ func getStatus() string {
 		status = setForeground(fore) + setBackground(back) + status
 	}
 	_, back := getColors(options["user"])
-	return reset + status + setForeground(back) + "\ue0b6"
+	return reset + status + setForeground(back) + start
 }
 
 func addSpaces(s string) string {
@@ -97,7 +100,7 @@ func getUser() string {
 
 func getHost() string {
 	hostname, _ := os.Hostname()
-	if options["hostname"] != "full" {
+	if options["fullname"] != "yes" {
 		hostname = strings.Split(hostname, ".")[0]
 	}
 	fore, back := getColors(options["host"])
@@ -107,14 +110,16 @@ func getHost() string {
 
 func getDir() string {
 	dir, _ := os.Getwd()
-	dir = strings.ReplaceAll(dir, os.Getenv("HOME"), "\uf015")
+	dir = strings.ReplaceAll(dir, os.Getenv("HOME"), home)
 	limit, err := strconv.ParseInt(options["limit"], 10, 64)
 	l := len(dir)
 	if err == nil && l > int(limit) {
-		// log.Printf("%v", l)
 		sub := dir[l-int(limit):]
 		p := strings.Index(sub, "/")
-		dir = "\uf065" + sub[p:]
+		if p < 0 {
+			p = 0
+		}
+		dir = shortcut + sub[p:]
 	}
 	fore, back := getColors(options["dir"])
 	return setForeground(fore) + setBackground(back) + addSpaces(dir) + reset + setForeground(back) + separator

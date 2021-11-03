@@ -5,11 +5,12 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/taflaj/prompt/prompt"
 )
 
-const version = "1.0.0"
+const version = "1.0.1"
 
 func init() {}
 
@@ -32,13 +33,12 @@ func main() {
 		case "init":
 			fmt.Println("PROMPT_COMMAND=set_prompt")
 			fmt.Println("set_prompt() {")
-			// fmt.Println("  PS1=\"$(code=$? jobs=$(jobs -p | wc -l) options=$PROMPT go run github.com/taflaj/prompt show)\" ")
 			fmt.Println("  PS1=\"$(code=$? jobs=$(jobs -p | wc -l) options=$PROMPT prompt show)\" ")
 			fmt.Println("}")
 		case "show":
 			prompt.Show()
 		case "version":
-			fmt.Printf("%v %v\n", os.Args[0], version)
+			fmt.Printf("%v %v on %v/%v with %v\n", os.Args[0], version, runtime.GOOS, runtime.GOARCH, runtime.Version())
 		default:
 			fmt.Println("Invalid command")
 			doHelp()
