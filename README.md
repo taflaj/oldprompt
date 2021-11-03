@@ -1,8 +1,6 @@
 # prompt
 A simple, yet powerful, command line prompt displayer
 
-**Note**: this is my original program but is not being maintained anymore; I'm currently working on a port to a different platform.
-
 ## Installation ##
 
 Download the source, compile it, and place the binary `prompt` on your path. Add the following lines to `.bashrc`:
