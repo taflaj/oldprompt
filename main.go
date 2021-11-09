@@ -10,7 +10,7 @@ import (
 	"github.com/taflaj/prompt/prompt"
 )
 
-const version = "1.0.1"
+const version = "1.1.0"
 
 func init() {}
 
@@ -33,8 +33,9 @@ func main() {
 		case "init":
 			fmt.Println("PROMPT_COMMAND=set_prompt")
 			fmt.Println("set_prompt() {")
-			fmt.Println("  PS1=\"$(code=$? jobs=$(jobs -p | wc -l) options=$PROMPT prompt show)\" ")
+			fmt.Println("  PS1=\"$(code=$? jobs=$(jobs -p | wc -l) options=$PROMPT prompt show)\"")
 			fmt.Println("}")
+			fmt.Println("trap 'tput sgr0' DEBUG")
 		case "show":
 			prompt.Show()
 		case "version":

@@ -10,18 +10,19 @@ import (
 )
 
 const (
-	clock       = "\uf017"
-	exclamation = "\uf12a"
+	clock       = "\uf017 "
+	exclamation = "\uf12a "
 	home        = "\uf015"
 	separator   = "\ue0b0"
-	shortcut    = "\uf0c4"
+	shortcut    = "\uf0c4 "
 	start       = "\ue0b6"
-	plain       = "\\[\x1b[0m\\]"
+	ansiStart   = "\\[\x1b["
+	ansiEnd     = "m\\]"
+	plain       = ansiStart + "0" + ansiEnd
 )
 
 var (
 	options map[string]string
-	reset   string
 	cozy    bool
 )
 
@@ -40,16 +41,16 @@ func getOptions() {
 
 func setForeground(color string) string {
 	if color == "" {
-		return color
+		return ansiStart + "39" + ansiEnd
 	}
-	return "\\[\x1b[38;5;" + color + "m\\]"
+	return ansiStart + "38;5;" + color + ansiEnd
 }
 
 func setBackground(color string) string {
 	if color == "" {
-		return color
+		return ansiStart + "49" + ansiEnd
 	}
-	return "\\[\x1b[48;5;" + color + "m\\]"
+	return ansiStart + "48;5;" + color + ansiEnd
 }
 
 func getColors(s string) (string, string) {
@@ -66,22 +67,17 @@ func getStatus() string {
 	status := ""
 	if os.Getenv("code") != "0" {
 		status += exclamation
-		if !cozy {
-			status += " "
-		}
 	}
-	if os.Getenv("jobs") != "0" {
+	jobs, err := strconv.ParseInt(os.Getenv("jobs"), 10, 0)
+	if err == nil && jobs > 1 {
 		status += clock
-		if !cozy {
-			status += " "
-		}
 	}
 	if len(status) > 0 {
 		fore, back := getColors(options["status"])
 		status = setForeground(fore) + setBackground(back) + status
 	}
 	_, back := getColors(options["user"])
-	return reset + status + setForeground(back) + start
+	return status + setForeground(back) + start
 }
 
 func addSpaces(s string) string {
@@ -111,7 +107,7 @@ func getHost() string {
 func getDir() string {
 	dir, _ := os.Getwd()
 	dir = strings.ReplaceAll(dir, os.Getenv("HOME"), home)
-	limit, err := strconv.ParseInt(options["limit"], 10, 64)
+	limit, err := strconv.ParseInt(options["limit"], 10, 0)
 	l := len(dir)
 	if err == nil && l > int(limit) {
 		sub := dir[l-int(limit):]
@@ -122,16 +118,22 @@ func getDir() string {
 		dir = shortcut + sub[p:]
 	}
 	fore, back := getColors(options["dir"])
-	return setForeground(fore) + setBackground(back) + addSpaces(dir) + reset + setForeground(back) + separator
+	_, next := getColors(options["command"])
+	return setForeground(fore) + setBackground(back) + addSpaces(dir) + setForeground(back) + setBackground(next) + separator
+}
+
+func restOfLine() string {
+	fore, back := getColors(options["command"])
+	return setForeground(fore) + setBackground(back) + " "
 }
 
 // Show displays the prompt according to the parameters
 func Show() {
 	getOptions()
-	reset = plain
+	reset := plain
 	if options["weight"] == "bold" {
-		reset = "\\[\x1b[0;1m\\]"
+		reset = ansiStart + "0;1" + ansiEnd
 	}
 	cozy = options["cozy"] == "yes"
-	fmt.Print(getStatus() + getUser() + getHost() + getDir() + plain + " ")
+	fmt.Print(reset + getStatus() + getUser() + getHost() + getDir() + restOfLine())
 }
