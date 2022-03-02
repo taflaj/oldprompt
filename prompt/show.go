@@ -72,6 +72,11 @@ func getStatus() string {
 	if err == nil && jobs > 1 {
 		status += clock
 	}
+	virtual := os.Getenv(("VIRTUAL_ENV"))
+	if virtual != "" {
+		p := strings.LastIndex(virtual, "/") + 1
+		status += virtual[p:] + " "
+	}
 	if len(status) > 0 {
 		fore, back := getColors(options["status"])
 		status = setForeground(fore) + setBackground(back) + status
