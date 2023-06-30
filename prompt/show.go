@@ -72,10 +72,14 @@ func getStatus() string {
 	if err == nil && jobs > 1 {
 		status += clock
 	}
-	virtual := os.Getenv(("VIRTUAL_ENV"))
+	virtual := os.Getenv("VIRTUAL_ENV")
 	if virtual != "" {
 		p := strings.LastIndex(virtual, "/") + 1
 		status += virtual[p:] + " "
+	}
+	toolbox := os.Getenv("TOOLBOX_NAME")
+	if toolbox != "" {
+		status += toolbox + " "
 	}
 	if len(status) > 0 {
 		fore, back := getColors(options["status"])
@@ -132,7 +136,6 @@ func restOfLine() string {
 	return setForeground(fore) + setBackground(back) + " "
 }
 
-// Show displays the prompt according to the parameters
 func Show() {
 	getOptions()
 	reset := plain
