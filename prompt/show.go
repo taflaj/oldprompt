@@ -81,6 +81,10 @@ func getStatus() string {
 	if toolbox != "" {
 		status += toolbox + " "
 	}
+	nixos := os.Getenv("IN_NIX_SHELL")
+	if nixos != "" {
+		status += nixos + " "
+	}
 	if len(status) > 0 {
 		fore, back := getColors(options["status"])
 		status = setForeground(fore) + setBackground(back) + status
