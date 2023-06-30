@@ -3,8 +3,8 @@ A simple, yet powerful, command line prompt displayer
 
 ## Installation ##
 
-1. Download the source and compile it, or otherwise download the proper executable file from the `bin` directory.
-2. Place the binary as `prompt` on your path.
+1. Download the source and compile it.
+2. Place the binary `prompt` on your path.
 3. Add the following lines to `.bashrc`:
 
 ``` bash
