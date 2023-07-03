@@ -77,24 +77,29 @@ func getStatus() string {
 		p := strings.LastIndex(virtual, "/") + 1
 		status += virtual[p:] + " "
 	}
-	toolbox := os.Getenv("TOOLBOX_NAME")
-	if toolbox != "" {
-		status += toolbox + " "
-	}
 	nixos := os.Getenv("IN_NIX_SHELL")
 	if nixos != "" {
 		status += nixos + " "
 	}
 	container := os.Getenv("container")
 	cid := os.Getenv("CONTAINER_ID")
+	toolbox := os.Getenv("TOOLBOX_NAME")
 	if container != "" {
-		if cid == "" {
+		if cid == "" && toolbox == "" {
 			status += container + " "
 		} else {
-			status += container + ":" + cid + " "
+			status += container + ":"
+			if cid != "" {
+				status += cid
+			} else {
+				status += toolbox
+			}
+			status += " "
 		}
 	} else if cid != "" {
 		status += cid + " "
+	} else if toolbox != "" {
+		status += toolbox + " "
 	}
 	if len(status) > 0 {
 		fore, back := getColors(options["status"])
