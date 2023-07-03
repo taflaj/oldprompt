@@ -85,6 +85,17 @@ func getStatus() string {
 	if nixos != "" {
 		status += nixos + " "
 	}
+	container := os.Getenv("container")
+	cid := os.Getenv("CONTAINER_ID")
+	if container != "" {
+		if cid == "" {
+			status += container + " "
+		} else {
+			status += container + ":" + cid + " "
+		}
+	} else if cid != "" {
+		status += cid + " "
+	}
 	if len(status) > 0 {
 		fore, back := getColors(options["status"])
 		status = setForeground(fore) + setBackground(back) + status
