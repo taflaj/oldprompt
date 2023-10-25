@@ -10,7 +10,7 @@ import (
 	"github.com/taflaj/prompt/prompt"
 )
 
-const version = "1.2.4"
+const version = "1.2.5"
 
 func init() {}
 
