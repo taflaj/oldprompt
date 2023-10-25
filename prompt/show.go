@@ -118,15 +118,15 @@ func addSpaces(s string) string {
 
 func getUser() string {
 	fore, back := getColors(options["user"])
-	user := setForeground(fore) + setBackground(back) + addSpaces(os.Getenv("USER"))
+	user := setForeground(fore) + setBackground(back) + addSpaces("\\u")
 	_, next := getColors(options["host"])
 	return user + setForeground(back) + setBackground(next) + separator
 }
 
 func getHost() string {
-	hostname, _ := os.Hostname()
+	hostname := "\\H"
 	if options["fullname"] != "yes" {
-		hostname = strings.Split(hostname, ".")[0]
+		hostname = "\\h"
 	}
 	fore, back := getColors(options["host"])
 	_, next := getColors(options["dir"])
