@@ -10,15 +10,10 @@ import (
 )
 
 const (
-	clock       = "\uf017 "
-	exclamation = "\uf12a "
-	home        = "\uf015"
-	separator   = "\ue0b0"
-	shortcut    = "\uf0c4 "
-	start       = "\ue0b6"
-	ansiStart   = "\\[\x1b["
-	ansiEnd     = "m\\]"
-	plain       = ansiStart + "0" + ansiEnd
+	separator = ``
+	ansiStart = "\\[\x1b["
+	ansiEnd   = "m\\]"
+	plain     = ansiStart + "0" + ansiEnd
 )
 
 var (
@@ -63,14 +58,33 @@ func getColors(s string) (string, string) {
 	return fore, back
 }
 
+func getTime() string {
+	if options["time"] != "yes" {
+		return ""
+	}
+	time, _ := strconv.ParseInt(os.Getenv("time"), 10, 64)
+	if time == 0 {
+		return ""
+	}
+	now, _ := strconv.ParseInt(os.Getenv("now"), 10, 64)
+	ms := (now - time) / 1000000
+	seconds := ms / 1000
+	ms %= 1000
+	minutes := seconds / 60
+	seconds %= 60
+	hours := minutes / 60
+	minutes %= 60
+	return fmt.Sprintf("󱑂 %d:%02d:%02d.%03d\n", hours, minutes, seconds, ms)
+}
+
 func getStatus() string {
 	status := ""
 	if os.Getenv("code") != "0" {
-		status += exclamation
+		status += ` `
 	}
-	jobs, err := strconv.ParseInt(os.Getenv("jobs"), 10, 0)
-	if err == nil && jobs > 1 {
-		status += clock
+	jobs, _ := strconv.ParseInt(os.Getenv("jobs"), 10, 0)
+	if jobs > 0 {
+		status += `  `
 	}
 	virtual := os.Getenv("VIRTUAL_ENV")
 	if virtual != "" {
@@ -101,12 +115,12 @@ func getStatus() string {
 	} else if toolbox != "" {
 		status += toolbox + " "
 	}
+	_, next := getColors(options["user"])
 	if len(status) > 0 {
 		fore, back := getColors(options["status"])
-		status = setForeground(fore) + setBackground(back) + status
+		status = setBackground(back) + setForeground(fore) + status
 	}
-	_, back := getColors(options["user"])
-	return status + setForeground(back) + start
+	return status + setForeground(next) + ``
 }
 
 func addSpaces(s string) string {
@@ -135,7 +149,7 @@ func getHost() string {
 
 func getDir() string {
 	dir, _ := os.Getwd()
-	dir = strings.ReplaceAll(dir, os.Getenv("HOME"), home)
+	dir = strings.ReplaceAll(dir, os.Getenv("HOME"), ``)
 	limit, err := strconv.ParseInt(options["limit"], 10, 0)
 	l := len(dir)
 	if err == nil && l > int(limit) {
@@ -144,7 +158,7 @@ func getDir() string {
 		if p < 0 {
 			p = 0
 		}
-		dir = shortcut + sub[p:]
+		dir = ` ` + sub[p:]
 	}
 	fore, back := getColors(options["dir"])
 	_, next := getColors(options["command"])
@@ -163,5 +177,5 @@ func Show() {
 		reset = ansiStart + "0;1" + ansiEnd
 	}
 	cozy = options["cozy"] == "yes"
-	fmt.Print(reset + getStatus() + getUser() + getHost() + getDir() + restOfLine())
+	fmt.Print(reset + getTime() + getStatus() + getUser() + getHost() + getDir() + restOfLine())
 }
